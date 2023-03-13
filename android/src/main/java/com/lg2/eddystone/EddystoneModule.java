@@ -292,16 +292,6 @@ public class EddystoneModule extends ReactContextBaseJavaModule {
         return;
     }
 
-    if (!reactContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
-      Log.d(LOG_TAG, "Bluetooth not supported");
-      return;
-    }
-
-    if (!reactContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-       Log.d(LOG_TAG, "BLE not supported");
-      return;
-    }
-
     ScanFilter serviceFilter = new ScanFilter.Builder().setServiceUuid(SERVICE_UUID).build();
 
     ScanFilter configurationFilter = new ScanFilter.Builder().setServiceUuid(CONFIGURATION_UUID).build();
