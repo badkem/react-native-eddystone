@@ -288,7 +288,7 @@ public class EddystoneModule extends ReactContextBaseJavaModule {
   public void startScanning() {
    try {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        getCurrentActivity().requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+        getCurrentActivity().requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
         return;
     }
 
