@@ -19,6 +19,10 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
 
 import android.Manifest;
+import android.os.Build;
+import android.util.Log;
+import android.content.pm.PackageManager;
+
 import android.content.*;
 import android.bluetooth.*;
 import android.bluetooth.le.*;
@@ -28,6 +32,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class EddystoneModule extends ReactContextBaseJavaModule {
+  private static final String LOG_TAG = "EddystoneModule";
+
   /** @property {ReactApplicationContext} The react app context */
   private final ReactApplicationContext reactContext;
 
@@ -280,6 +286,22 @@ public class EddystoneModule extends ReactContextBaseJavaModule {
    */
   @ReactMethod
   public void startScanning() {
+   try {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        getCurrentActivity().requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+        return;
+    }
+
+    if (!reactContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+      Log.d(LOG_TAG, "Bluetooth not supported");
+      return;
+    }
+
+    if (!reactContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+       Log.d(LOG_TAG, "BLE not supported");
+      return;
+    }
+
     ScanFilter serviceFilter = new ScanFilter.Builder().setServiceUuid(SERVICE_UUID).build();
 
     ScanFilter configurationFilter = new ScanFilter.Builder().setServiceUuid(CONFIGURATION_UUID).build();
@@ -292,7 +314,7 @@ public class EddystoneModule extends ReactContextBaseJavaModule {
 
     getCurrentActivity().requestPermissions(
       new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-      1
+       1
     );
 
     getCurrentActivity().requestPermissions(
@@ -305,9 +327,12 @@ public class EddystoneModule extends ReactContextBaseJavaModule {
       getCurrentActivity().startActivityForResult(enableBtIntent, 8123);
     }
 
-    // start scanning
-    scanner = bluetoothAdapter.getBluetoothLeScanner();
-    scanner.startScan(filters, settings, scanCallback);
+     Log.d(LOG_TAG, "Starting scan");
+     scanner = bluetoothAdapter.getBluetoothLeScanner();
+     scanner.startScan(filters, settings, scanCallback);
+   } catch (Exception e) {
+     e.printStackTrace();
+   }
   }
 
   /**
